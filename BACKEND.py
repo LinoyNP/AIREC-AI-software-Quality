@@ -4,8 +4,10 @@ eventlet.monkey_patch()
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from openai import OpenAI
+from google import genai
 import requests
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+#client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask( __name__,)
 app.config['SECRET_KEY'] = 'key!secret!'
@@ -24,19 +26,18 @@ def handle_code(data):
     code = data.get('code')
     print('Received code:', code)
     prompt = f"Analyze this code for readability, correctness, and security (both in words and as percentages):\n{code}"
+
     ###
     # ----here we send the code to models and recieved the result, and then
     ###
-    #HuggingFace GPT-OSS 120b
-    #result = queryHuggingfaceApi(prompt)
 
-    client = OpenAI(
+    clientGPT = OpenAI(
         base_url="https://router.huggingface.co/v1",
         api_key=HFtoken,
     )
 
     #gpt-oss-120b
-    completion = client.chat.completions.create(
+    completion = clientGPT.chat.completions.create(
         model="openai/gpt-oss-120b:cerebras",
         messages=[{"role": "user", "content": prompt}],
     )
@@ -53,8 +54,19 @@ def handle_code(data):
     # result = f" checking sendig to web {code}"
     # result = response.output_text
 
-    print(result)
-    emit('code_result', {'result': result})
+    print(f"{result} \n finish print gpt")
+    emit('code_result', {'result': f"GPT:\n{result}"})
+    #
+    #gemini
+    # The client gets the API key from the environment variable `GEMINI_API_KEY`.
+    clientGemini = genai.Client()
+
+    response = clientGemini.models.generate_content(
+        model="gemini-2.5-flash", contents=prompt
+    )
+    print(f"{response.text} finish print")
+    emit('code_result', {'result': f"GEMINI:\n{response.text}"})
 
 if __name__ == '__main__':
+    print(f"To AIREC open: http://localhost:5000/")
     socketio.run(app)
