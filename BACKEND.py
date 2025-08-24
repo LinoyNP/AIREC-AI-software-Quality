@@ -22,9 +22,14 @@ def index():
 
 # Receiving code as text(string) from the user
 @socketio.on('send_code')
+
 def handle_code(data):
     code = data.get('code')
     print('Received code:', code)
+    """
+    Defining engineering programming principles:
+    #readability- 
+    """
     prompt = f"Analyze this code for readability, correctness, and security (both in words and as percentages):\n{code}"
 
     ###
@@ -62,7 +67,8 @@ def handle_code(data):
     clientGemini = genai.Client()
 
     response = clientGemini.models.generate_content(
-        model="gemini-2.5-flash", contents=prompt
+        model="gemini-2.5-flash",
+        contents=prompt
     )
     print(f"{response.text} finish print")
     emit('code_result', {'result': f"GEMINI:\n{response.text}"})
