@@ -1,72 +1,183 @@
-import os
-import eventlet
-eventlet.monkey_patch()
-from flask import Flask, render_template
-from flask_socketio import SocketIO, emit
-from openai import OpenAI
-from google import genai
-import requests
+import os  # Allows the code to interact with the operating system, e.g., reading environment variables (useful for API keys)
+os.environ["EVENTLET_NO_GREENDNS"] = "yes"
+import eventlet  # A library for asynchronous networking, allows handling multiple connections efficiently
+eventlet.monkey_patch()  # Modifies standard Python libraries to work asynchronously with Eventlet
+from flask import Flask, render_template, request, jsonify  # Flask framework and utilities for web server, templates, handling requests, and returning JSON
+from flask_socketio import SocketIO, emit  # SocketIO enables real-time communication between server and client; emit sends messages to clients
+from openai import OpenAI  # OpenAI client library to interact with OpenAI / HuggingFace models
+#NISIM
+#from google import genai
+#Noa
+import google.generativeai as genai  # Google Generative AI client library for using Gemini and other Google models
+import requests  # Standard library for sending HTTP requests, useful for APIs without a dedicated client
 
-#client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
+#-----------------------------------------MAIN
 app = Flask( __name__,)
 app.config['SECRET_KEY'] = 'key!secret!'
 socketio = SocketIO(app)
 
+#-----------------------------------------ENVIRONMENT VARIABLE
 HFtoken = os.getenv("HUGGINGFACE_API_KEY")
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
+API_URL = "https://router.huggingface.co/v1/chat/completions"
 
+#--------------------------------CHECK FOR HF
+def check_hf_connection():
+    """בדיקת חיבור ל-HuggingFace API."""
+    headers = {"Authorization": f"Bearer {HFtoken}"}
+    data = {"model": "openai/gpt-oss-120b:cerebras", "messages": [{"role": "user", "content": "Hello"}]}
+    response = requests.post(API_URL, headers=headers, json=data)
+    print("HuggingFace Token status:", response.status_code, response.text)
+#--------------------------------END CHECK FOR HF
+
+def build_analysis_prompt(code: str) -> str:
+    return f"""
+    Please analyze the following code in detail. The analysis should be written in Hebrew, clearly structured and visually organized.
+    Code:
+    {code}
+    For this code, please provide:
+    1. Readability: Give a percentage score (0-100%) and a detailed explanation in Hebrew about how easy it is to read and understand the code. Mention naming conventions, comments, formatting, and clarity.
+    2. Correctness: Give a percentage score (0-100%) and explain in Hebrew whether the code works as intended, whether there are potential bugs, logical errors, or edge cases that might fail.
+    3. Security: Give a percentage score (0-100%) and explain in Hebrew any security risks, vulnerabilities, or unsafe practices in the code.
+    4. Additional Notes: Any suggestions for improvement, refactoring, or best practices, in Hebrew. Be as detailed and precise as possible.
+    Format the output neatly with clear headings for each section, percentages, and explanations. Use line breaks and bullet points if needed to make it easy to read.
+    """
+
+def HuggingFaceAPI_GPT(prompt: str) -> str:
+    clientGPT = OpenAI(base_url="https://router.huggingface.co/v1",api_key=HFtoken,)
+    completion = clientGPT.chat.completions.create(
+        model="openai/gpt-oss-120b:cerebras",
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return completion.choices[0].message.content
+
+def GeminiAPI(prompt: str) -> str:
+    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    model = genai.GenerativeModel("gemini-2.5-flash")
+    response = model.generate_content(prompt)
+    return response.text
+
+def MistralAPI(prompt: str) -> str:
+    headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}","Content-Type": "application/json", }
+    data = {"model": "mistral-tiny","messages": [{"role": "user", "content": prompt}], }
+    mistral_response = requests.post(MISTRAL_API_URL, headers=headers, json=data)
+    return mistral_response.json()['choices'][0]['message']['content']
+
+
+@socketio.on('send_code')
+def handle_code(data):
+    code = data.get('code')
+    print('Received code:', code)
+
+    prompt = build_analysis_prompt(code)
+
+    hf_result = HuggingFaceAPI_GPT(prompt)
+    emit('code_result', {'result': f"GPT:\n{hf_result}"})
+
+    gemini_result = GeminiAPI(prompt)
+    emit('code_result', {'result': f"GEMINI:\n{gemini_result}"})
+
+    mistral_result = MistralAPI(prompt)
+    emit('code_result', {'result': f"MISTRAL:\n{mistral_result}"})
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Receiving code as text(string) from the user
-@socketio.on('send_code')
-def handle_code(data):
-    code = data.get('code')
-    print('Received code:', code)
-    prompt = f"Analyze this code for readability, correctness, and security (both in words and as percentages):\n{code}"
-
-    ###
-    # ----here we send the code to models and recieved the result, and then
-    ###
-
-    clientGPT = OpenAI(
-        base_url="https://router.huggingface.co/v1",
-        api_key=HFtoken,
-    )
-
-    #gpt-oss-120b
-    completion = clientGPT.chat.completions.create(
-        model="openai/gpt-oss-120b:cerebras",
-        messages=[{"role": "user", "content": prompt}],
-    )
-
-    print(completion.choices[0].message)
-    result = completion.choices[0].message.content
-
-    #GPT
-    # response = client.responses.create(
-    #     model="gpt-5",
-    #     input=prompt
-    # )
-    #
-    # result = f" checking sendig to web {code}"
-    # result = response.output_text
-
-    print(f"{result} \n finish print gpt")
-    emit('code_result', {'result': f"GPT:\n{result}"})
-    #
-    #gemini
-    # The client gets the API key from the environment variable `GEMINI_API_KEY`.
-    clientGemini = genai.Client()
-
-    response = clientGemini.models.generate_content(
-        model="gemini-2.5-flash", contents=prompt
-    )
-    print(f"{response.text} finish print")
-    emit('code_result', {'result': f"GEMINI:\n{response.text}"})
-
 if __name__ == '__main__':
-    print(f"To AIREC open: http://localhost:5000/")
+    check_hf_connection()
+    print(f"AIREC: http://localhost:5000/")
     socketio.run(app)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#
+# # Receiving code as text(string) from the user
+# @socketio.on('send_code')
+# def handle_code(data):
+#     code = data.get('code')
+#     print('Received code:', code)
+#     #prompt = f"Analyze this code for readability, correctness, and security (both in words and as percentages):\n{code}"
+#     prompt = f"""
+#     Please analyze the following code in detail. The analysis should be written in Hebrew, clearly structured and visually organized.
+#     Code:
+#     {code}
+#     For this code, please provide:
+#     1. Readability: Give a percentage score (0-100%) and a detailed explanation in Hebrew about how easy it is to read and understand the code. Mention naming conventions, comments, formatting, and clarity.
+#     2. Correctness: Give a percentage score (0-100%) and explain in Hebrew whether the code works as intended, whether there are potential bugs, logical errors, or edge cases that might fail.
+#     3. Security: Give a percentage score (0-100%) and explain in Hebrew any security risks, vulnerabilities, or unsafe practices in the code.
+#     4. Additional Notes : Any suggestions for improvement, refactoring, or best practices, in Hebrew. Be as detailed and precise as possible.
+#     Format the output neatly with clear headings for each section, percentages, and explanations. Use line breaks and bullet points if needed to make it easy to read.
+#     """
+#
+# # ---------------------------------here we send the code to models and received the result, and then
+#
+# #----------------------------------GPT  HuggingFace  gpt-oss-120b
+#     clientGPT = OpenAI(
+#         base_url="https://router.huggingface.co/v1",
+#         api_key=HFtoken,
+#     )
+#     completion = clientGPT.chat.completions.create(
+#         model="openai/gpt-oss-120b:cerebras",
+#         messages=[{"role": "user", "content": prompt}],
+#     )
+#     result = completion.choices[0].message.content
+#     emit('code_result', {'result': f"GPT:\n{result}"})
+#
+#     #GPT5
+#     # response = client.responses.create(
+#     #     model="gpt-5",
+#     #     input=prompt
+#     # )
+#     #
+#     # result = f" checking sendig to web {code}"
+#     # result = response.output_text
+#     #print(f"{result} \n finish print gpt")    #
+#
+# #----------------------------------gemini # The client gets the API key from the environment variable `GEMINI_API_KEY`.
+#
+#     #NISIM
+#     # clientGemini = genai.Client()
+#     # response = clientGemini.models.generate_content(
+#     #     model="gemini-2.5-flash", contents=prompt
+#     # )
+#
+#     #NOA
+#     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+#     model = genai.GenerativeModel("gemini-2.5-flash")
+#     response = model.generate_content(prompt)
+#     emit('code_result', {'result': f"GEMINI:\n{response.text}"})
+#     #print(f"{response.text} finish print")
+#
+# #----------------------------------Mistral
+#     headers = {
+#             "Authorization": f"Bearer {MISTRAL_API_KEY}",
+#             "Content-Type": "application/json",
+#     }
+#     data = {
+#             "model": "mistral-tiny",
+#             "messages": [{"role": "user", "content": prompt}],
+#     }
+#     mistral_response = requests.post(MISTRAL_API_URL, headers=headers, json=data)
+#     emit('code_result', {'result': f"MISTRAL:\n{mistral_response.json()['choices'][0]['message']['content']}"})
+#
+# if __name__ == '__main__':
+#     print(f"AIREC: http://localhost:5000/")
+#     socketio.run(app)
