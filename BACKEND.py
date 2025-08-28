@@ -28,7 +28,21 @@ def handle_code(data):
     print('Received code:', code)
     """
     Defining engineering programming principles:
-    #readability- 
+    #readability- measure of how easily a person can understand a given code segment, easily one can understand
+        how the code actually functions and understanding the intent and purpose of the code.
+         •Consistent use of meaningful names to communicate intent rather than just content.
+         • Proper software structure, including modular code separated into clear logical blocks.
+         • Use comments sparingly- excessive commenting can be a sign of unclear code.
+         • Proper formatting, such as indentation, line length, and spacing, which contribute to visual comprehension 
+         • without code smells- suggest design issues even if the code functions correctly like include unnecessary repetitions, unclear
+            variable names, or excessively long functions.
+    #Correctness - It refers to the accuracy with which code performs its intended tasks and requires thorough 
+        verification and testing to guarantee that the code behaves as expected in all scenarios.
+        Understanding the task - If the task can be interpreted in multiple ways, ask the user what they mean.
+    #Security - ensure that systems can operate normally even under external threats and attacks.
+        check that there is no vulnerabilities in code such as bugs, defects, weaknesses,improper data validation or
+         incorrect memory allocation which can lead to violations of system security policies and negatively impact the confiden tiality, integrity, and availability of information
+        Safe memory management
     """
     prompt = f"Analyze this code for readability, correctness, and security (both in words and as percentages):\n{code}"
 
