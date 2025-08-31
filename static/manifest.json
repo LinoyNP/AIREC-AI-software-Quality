@@ -1,0 +1,40 @@
+
+{
+  "_comment_1": "This file provides the browser with information about the web application, making it 'installable' and behave like a native app. It is linked in the <head> of the main HTML file: <link rel=\"manifest\" href=\"/manifest.json\">",
+  
+  "_comment_name": "The full name of the web application, This is shown to the user on the app's install banner and in app stores.",
+  "name": "AIREC-AI-software-Quality",
+  "short_name": "AIREC",
+  "description": "An offline tool for code quality assessment.",
+  
+  "_comment_url":"The URL that the user is directed to when they launch the application from the home screen. A value of points to the root directory." ,
+  "start_url": ".",
+  
+  "_comment_display": " The preferred display mode for the application-'standalone' makes the web app open in a dedicated window, hiding the browser'saddress bar" ,
+  "display": "standalone",
+  
+  "_comment_background": "The background color of the splash screen that is shown when the application is launched from the home screen. This color is displayed before the web content loads, creating a seamless transition. It should match your main app background color",
+  "background_color": "rgb(178, 173, 225)",
+  
+  "_comment_theme": " The theme color of the application. This color is often used by the operating system to tint the status bar, title bar, and other UI elements.",
+  "theme_color": "#000000",
+  
+  "_comment_icons": "An array of icon objects. The browser will select the most appropriate icon based on the device's screen density and resolution. Providing multiple sizes ensures a high-quality icon on all devices.",
+  "icons": [
+    {
+      "src": "/static/icons/Airec-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icons/Airec-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/Airec.png",
+      "sizes": "558x626",
+      "type": "image/png"
+    }
+  ]
+}

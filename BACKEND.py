@@ -2,7 +2,7 @@ import os  # Allows the code to interact with the operating system, e.g., readin
 os.environ["EVENTLET_NO_GREENDNS"] = "yes"
 import eventlet  # A library for asynchronous networking, allows handling multiple connections efficiently
 eventlet.monkey_patch()  # Modifies standard Python libraries to work asynchronously with Eventlet
-from flask import Flask, render_template, request, jsonify  # Flask framework and utilities for web server, templates, handling requests, and returning JSON
+from flask import Flask, render_template, request, jsonify,send_from_directory   # Flask framework and utilities for web server, templates, handling requests, and returning JSON. Send_from_directory: serves static files (e.g., JavaScript, images, manifest) from a specified directory.
 from flask_socketio import SocketIO, emit  # SocketIO enables real-time communication between server and client; emit sends messages to clients
 from openai import OpenAI  # OpenAI client library to interact with OpenAI / HuggingFace models
 #NISIM
@@ -10,7 +10,6 @@ from openai import OpenAI  # OpenAI client library to interact with OpenAI / Hug
 #Noa
 import google.generativeai as genai  # Google Generative AI client library for using Gemini and other Google models
 import requests  # Standard library for sending HTTP requests, useful for APIs without a dedicated client
-
 #-----------------------------------------MAIN
 app = Flask( __name__,)
 app.config['SECRET_KEY'] = 'key!secret!'
@@ -104,6 +103,15 @@ def handle_code(data):
 def index():
     return render_template('index.html')
 
+# Flask route to serve the service worker JavaScript file.
+# This is used in Progressive Web Apps (PWAs) to enable features like offline support,
+# caching, and background sync. The service worker must be accessible from the root scope
+# (i.e., '/service_worker.js') to control the entire application.
+# Since Flask does not serve files from the root directory by default,
+# we manually serve the file using send_from_directory and os.getcwd().
+@app.route('/service_worker.js')
+def sw():
+    return send_from_directory(os.getcwd(), 'service_worker.js')
 
 if __name__ == '__main__':
     check_hf_connection()
