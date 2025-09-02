@@ -32,6 +32,11 @@
       "type": "image/png"
     },
     {
+      "src": "/static/icons/Airec-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
       "src": "/static/Airec.png",
       "sizes": "558x626",
       "type": "image/png"

@@ -67,32 +67,56 @@ document.addEventListener("DOMContentLoaded", function() {
         sendCodeToServer();
 })});
 
-var socket = io();
+let socket = null;
+//Only if there is an active internet connection, the socket that connects to the backend will be opened, 
+// otherwise the site will be operated in online mode
+if (navigator.onLine) {
+  try {
+    socket = io();
+    socket.on('connect', function() {
+      console.log("Connection to server successful");
+      socket.emit('my event', {data: 'I\'m connected!'});
+     });
 
-socket.on('connect', function() {
-    socket.emit('my event', {data: 'I\'m connected!'});
-});
+    socket.on('disconnect', function() {
+      console.warn("You are disconnected from the server, you are taken offline.");
+    });
+
+    socket.on('connect_error', function(err) {
+      console.warn("You are taken offline- error connecting to server:", err);
+    });
+    // socket.on('code_result', (data) => {
+    //   document.getElementById("output").innerText = data.result;
+    // });
+    
+    socket.on('code_result', (data) => {
+      const container = document.getElementById("messages");   
+      const newResult = document.createElement("div");       
+      newResult.textContent = data.result;                  
+      container.appendChild(newResult);
+      container.scrollTop = container.scrollHeight; 
+    });
+  }
+  catch (err) {
+    console.error("Error connecting to Socket.IO:", err);
+  }
+} 
+else {
+  console.warn("No internet connection - socket will not run");
+}
 
 
 function sendCodeToServer() {
   const userCode = document.getElementById("codeInput").value;
    addUserMessage(userCode);
-  socket.emit('send_code', { code: userCode });
-    document.getElementById("codeInput").value = "";
+  if (!navigator.onLine|| !socket || !socket.connected) {
+    // Offline mode → Local operation activation
+    runLocalModel(userCode);
+  } else {
+    socket.emit('send_code', { code: userCode });
+  }
+  document.getElementById("codeInput").value = "";
 };
-
-
-// socket.on('code_result', (data) => {
-//   document.getElementById("output").innerText = data.result;
-// });
-
-socket.on('code_result', (data) => {
-  const container = document.getElementById("messages");   
-  const newResult = document.createElement("div");       
-  newResult.textContent = data.result;                  
-  container.appendChild(newResult);
-  container.scrollTop = container.scrollHeight; 
-});
 
 function addUserMessage(text) {
   const container = document.getElementById("messages");
@@ -110,7 +134,7 @@ function addUserMessage(text) {
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service_worker.js')
+        navigator.serviceWorker.register('/service_worker.js')
             .then(registration => {
                 // Service Worker registration successful
                 console.log('Service Worker registered with scope:', registration.scope);
@@ -122,6 +146,16 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+function runLocalModel(code) {
+  // The actions that will be performed offline
+  const container = document.getElementById("messages");
+  const div = document.createElement("div");
+  div.textContent = "You are offline.\n Local result for: " + code;
+  // div.classList.add("offline-result");
+  div.classList.add("user-message");
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
 
 
 
