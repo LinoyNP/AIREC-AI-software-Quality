@@ -1,185 +1,182 @@
-// var socket = io();
-
-// socket.on('connect', function() {
-//     socket.emit('my event', {data: 'I\'m connected!'});
-// });
-
-// function sendCodeToServer() {
-//   const userCode = document.getElementById("codeInput").value;
-  
-//   addUserMessage(userCode);
-
-//   socket.emit('send_code', { code: userCode });
-
-//   document.getElementById("codeInput").value = "";
-// }
-
-// socket.on('code_result', (data) => {
-//   addBotMessage(data.result);
-// });
-
-
-// function addUserMessage(text) {
-//   const messages = document.getElementById("messages");
-//   const date = new Date();
-//   const str_time = date.getHours() + ":" + String(date.getMinutes()).padStart(2, '0');
-
-//   const userHtml = `
-//     <div class="d-flex justify-content-end mb-4">
-//       <div class="msg_cotainer_send">
-//         ${text}
-//         <span class="msg_time_send">${str_time}</span>
-//       </div>
-//       </div>
-//     </div>`;
-  
-//   messages.insertAdjacentHTML("beforeend", userHtml);
-//   scrollToBottom(messages);
-// }
-// function addBotMessage(text) {
-//   const messages = document.getElementById("messages");
-//   const date = new Date();
-//   const str_time = date.getHours() + ":" + String(date.getMinutes()).padStart(2, '0');
-
-//   const botHtml = `
-//     <div class="d-flex justify-content-start mb-4">
-//       <div class="img_cont_msg">
-//         <img src="{{ url_for('static', filename='Airec.png') }}" class="rounded-circle user_img_msg">
-//       </div>
-//       <div class="msg_cotainer">
-//         ${text}
-//         <span class="msg_time">${str_time}</span>
-//       </div>
-//     </div>`;
-  
-//   messages.insertAdjacentHTML("beforeend", botHtml);
-//   scrollToBottom(messages);
-// }
-
-// function scrollToBottom(container) {
-//   container.scrollTop = container.scrollHeight;
-// }
-
-
-document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("chatForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        sendCodeToServer();
-})});
-
+// ----------DOM ELEMENTS----------
 let socket = null;
-//Only if there is an active internet connection, the socket that connects to the backend will be opened, 
-// otherwise the site will be operated in online mode
-if (navigator.onLine) {
-  try {
-    socket = io();
-    socket.on('connect', function() {
-      console.log("Connection to server successful");
-      socket.emit('my event', {data: 'I\'m connected!'});
-     });
+let chatBox;
+let inputField;
+let sendButton;
+let welcomeScreen;
 
-    socket.on('disconnect', function() {
-      console.warn("You are disconnected from the server, you are taken offline.");
-    });
+// ----------INITIALIZATION----------
+document.addEventListener("DOMContentLoaded", function () {
+    cacheDomElements();
+    setupFormListener();
+    initializeSocket();
+    registerServiceWorker();
+});
 
-    socket.on('connect_error', function(err) {
-      console.warn("You are taken offline- error connecting to server:", err);
-    });
-    // socket.on('code_result', (data) => {
-    //   document.getElementById("output").innerText = data.result;
-    // });
-    
-    socket.on('code_result', (data) => {
-      const container = document.getElementById("messages");   
-      const newResult = document.createElement("div");       
-      newResult.textContent = data.result;                  
-      container.appendChild(newResult);
-      container.scrollTop = container.scrollHeight; 
-    });
-  }
-  catch (err) {
-    console.error("Error connecting to Socket.IO:", err);
-  }
-} 
-else {
-  console.warn("No internet connection - socket will not run");
+function cacheDomElements() {
+    chatBox = document.getElementById("chat-box")
+    inputField = document.getElementById("codeInput");
+    sendButton = document.getElementById("send-btn")
+    welcomeScreen = document.getElementById("welcome-screen");
 }
 
+// ----------FORM HANDLING----------
+function setupFormListener() {
+    sendButton.addEventListener("click", sendMessage);
 
-function sendCodeToServer() {
-  const userCode = document.getElementById("codeInput").value;
-   addUserMessage(userCode);
-  if (!navigator.onLine|| !socket || !socket.connected) {
-    // Offline mode → Local operation activation
-    runLocalModel(userCode);
-  } else {
-    socket.emit('send_code', { code: userCode });
-  }
-  document.getElementById("codeInput").value = "";
-};
+    inputField.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    inputField.addEventListener("input", function () {
+        autoGrow(this);
+    });
+}
+
+// ----------SOCKET CONNECTION----------
+function initializeSocket() {
+    //Only if there is an active internet connection, the socket that connects to the backend will be opened, 
+    // otherwise the site will be operated in online mode
+    if (!navigator.onLine) {
+        console.log("No internet connection - socket will not run");
+        return;
+    }
+
+    try {
+        socket = io();
+        setupSocketEvents();
+    } catch (err) {
+        console.error("Error connecting to Socket.IO:", err);
+    }
+}
+
+function setupSocketEvents() {
+    socket.on('connect', handleSocketConnect);
+    socket.on('disconnect', handleSocketDisconnect);
+    socket.on('connect_error', handleSocketError);
+    socket.on('code_result', handleServerResult);
+}
+
+function handleSocketConnect() {
+    console.log("Connection to server successful");
+    socket.emit('my event', { data: "I'm connected!" });//עדיין לא הבנתי למי ההודעה מיועדת
+}
+
+function handleSocketDisconnect() {
+    console.log("You are disconnected from the server, you are taken offline.");
+}
+
+function handleSocketError(err) {
+    console.warn("You are taken offline- error connecting to server:", err);
+}
+
+//----------MESSAGE HANDLING----------
+function sendMessage() {
+    const userMessage = inputField.value.trim();
+    if (userMessage === "") return;
+
+    addUserMessage(userMessage);
+
+    if (!navigator.onLine || !socket || !socket.connected) {
+        // Offline mode → Local operation activation
+        runLocalModel(userMessage);
+    } else {
+        socket.emit("send_code", { code: userMessage });
+    }
+
+    inputField.value = "";
+    autoGrow(inputField);
+}
 
 function addUserMessage(text) {
-  const container = document.getElementById("messages");
-  const div = document.createElement("div");
-  div.textContent = text;
-  div.classList.add("user-message"); // אפשר להוסיף CSS אם רוצים
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
-};
+    appendMessage(text, "user");
+}
 
-// Register the Service Worker
-// This code ensures the Service Worker (managing the logic of requests) is registered only after the entire page has fully loaded,
-// which is a best practice to avoid blocking the initial page load.
-// It's recommended to place this in main application JavaScript file.
+function handleServerResult(data) {
+    appendMessage(data.result, "bot");
+}
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service_worker.js')
-            .then(registration => {
-                // Service Worker registration successful
-                console.log('Service Worker registered with scope:', registration.scope);
-            })
-            .catch(error => {
-                // Service Worker registration failed
-                console.error('Service Worker registration failed:', error);
-            });
+function appendMessage(message, sender) {
+    // If the welcome screen is visible, wait for it to disappear
+    if (
+        !chatBox.hasChildNodes() &&
+        welcomeScreen &&
+        !welcomeScreen.classList.contains("welcome-hidden")
+    ) {
+        welcomeScreen.classList.add("welcome-hidden");
+        setTimeout(() => {
+            welcomeScreen.style.display = "none";
+            appendMessage(message, sender);
+        }, 500);
+        return;
+    }
+
+    // Create message bubble
+    const msg = document.createElement("div");
+    msg.classList.add("message", sender);
+
+    // Render markdown instead of plain text
+    if (typeof marked !== "undefined") {
+        msg.innerHTML = marked.parse(message);
+    } else {
+        msg.textContent = message;
+    }
+
+    // Create copy button
+    const copyBtn = document.createElement("button");
+    copyBtn.classList.add("copy-btn");
+    // Icon created by shin_icons - Flaticon
+    // Link: https://www.flaticon.com/free-icons/ui
+    copyBtn.innerHTML = `<img src="static/icons/copy.png" alt="Copy" />`;
+
+    copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(message);
+        copyBtn.style.opacity = "1";
+        setTimeout(() => (copyBtn.style.opacity = "0.5"), 800);
     });
+
+    msg.appendChild(copyBtn);
+
+    // Append to chat box
+    chatBox.appendChild(msg);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+/* Auto-growing textarea */
+function autoGrow(element) {
+    element.style.height = "auto";
+    element.style.height = element.scrollHeight + "px";
+}
+
+// ----------OFFLINE MODE----------
 function runLocalModel(code) {
-  // The actions that will be performed offline
-  const container = document.getElementById("messages");
-  const div = document.createElement("div");
-  div.textContent = "You are offline.\n Local result for: " + code;
-  // div.classList.add("offline-result");
-  div.classList.add("user-message");
-  container.appendChild(div);
-  container.scrollTop = container.scrollHeight;
+    // The actions that will be performed offline
+    // =========================
+    // TODO:
+    // ----------------------------------------------MODEL AI
+    appendMessage("You are offline.\n Local result for: " + code, "bot");
 }
 
-
-
-
-// var socket = io();
-
-// socket.on('connect', function() {
-//     socket.emit('my event', {data: 'I\'m connected!'});
-// });
-
-
-// function sendCodeToServer() {
-//   const userCode = document.getElementById("codeInput").value;
-//   socket.emit('send_code', { code: userCode });
-// }
-
-
-// // socket.on('code_result', (data) => {
-// //   document.getElementById("output").innerText = data.result;
-// // });
-
-// socket.on('code_result', (data) => {
-//   const container = document.getElementById("output");   
-//   const newResult = document.createElement("div");       
-//   newResult.textContent = data.result;                  
-//   container.appendChild(newResult);
-// });
+// ----------SERVICE WORKER----------
+function registerServiceWorker() {
+    // Register the Service Worker
+    // This code ensures the Service Worker (managing the logic of requests) is registered only after the entire page has fully loaded,
+    // which is a best practice to avoid blocking the initial page load.
+    // It's recommended to place this in main application JavaScript file.
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service_worker.js')
+                .then(registration => {
+                    // Service Worker registration successful
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    // Service Worker registration failed
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    }
+}

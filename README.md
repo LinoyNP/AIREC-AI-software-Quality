@@ -1,7 +1,7 @@
 # AIREC 
 
 **AIREC** is an advanced **code analysis tool** designed to evaluate submitted code based on three core principles:
-![AIREC Logo](p.png)
+![AIREC Logo](static/icons/p.png)
 ---
 
 ## 🌟 Core Principles

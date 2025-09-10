@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,66 +12,42 @@
    <link rel="apple-touch-icon" href="\static\icons\Airec-96x96.png">
    <meta name="apple-mobile-web-app-status-bar" content="rgb(188, 184, 241)">
    <meta name="theme-color" content="rgb(188, 184, 241)">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-</head>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="icon" type="image/png" href="/static/Airec.png" />
+  </head>
 <body>
-  <div class="container-fluid h-100">
-    <div class="row justify-content-center h-100">
-      <div class="col-md-8 col-xl-6 chat">
-        <div class="card">
-          <div class="card-header msg_head">
-            <div class="d-flex bd-highlight">
-              <div class="img_cont">
-                <img src="{{ url_for('static', filename='Airec.png') }}" class="rounded-circle user_img"/>
-                <span class="online_icon"></span>
-              </div>
-              <div class="user_info">
-                <span>AIREC</span>
-                <p>AI Code Assistant</p>
-              </div>
-            </div>
-          </div>
-          <div id="messages" class="card-body msg_card_body"></div>
-          <div class="card-footer">
-            <form id="chatForm" class="input-group">
-              <input type="text" id="codeInput" placeholder="Type here..." autocomplete="off" class="form-control type_msg" required>
-              <div class="input-group-append">
-                <button type="submit" class="input-group-text send_btn">
-                  <i class="fas fa-location-arrow"></i>
-                </button>
-              </div>
-            </form>
-          </div>
+  <div class="chat-container">
+      <!-- Chat Header -->
+      <header class="chat-header">
+        <h1>AIREC</h1>
+      </header>
+
+      <!-- Welcome message -->
+      <div id="welcome-screen" class="welcome-screen">
+        <h2>Welcome to <span>AIREC</span></h2>
+        <p>Your coding AI assistant</p>
+      </div>
+
+      <!-- Chat Messages -->
+      <div id="chat-box" class="chat-box"></div>
+
+      <!-- Floating Chat Input -->
+      <div class="chat-input-wrapper">
+        <div class="chat-input-container">
+          <textarea
+            id="codeInput"
+            placeholder="Send a message..."
+            rows="1"
+          ></textarea>
+          <button id="send-btn">➤</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="/static/script.js"></script>
-</body>
+    <script src="/static/script.js"></script>
+  </body>
 </html>
-
-
-
-<!-- <!DOCTYPE html>
-<html lang="he">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIREC</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-  <script src="/static/script.js"></script>
-    
-</head>
-<body>
-  <h1>Title</h1>
-
-  <div class="input-container">
-    <input type="text" id="codeInput" placeholder="Type here...">
-    <button onclick="sendCodeToServer()">send</button>
-  </div>
-
-  <p id="output"></p>
-</body>
-</html> -->
