@@ -1,0 +1,12 @@
+Flask
+Flask-SocketIO
+eventlet
+openai
+google-generativeai
+google-genai
+requests
+transformers
+kernels
+torch
+fastapi
+uvicorn
