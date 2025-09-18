@@ -112,6 +112,6 @@ def sw():
     return send_from_directory(os.getcwd(), 'service_worker.js')
 
 if __name__ == '__main__':
-    check_hf_connection()
+    #check_hf_connection()
     print(f"AIREC: http://localhost:5000/")
     socketio.run(app)
