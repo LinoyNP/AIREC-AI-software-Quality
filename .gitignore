@@ -32,14 +32,10 @@ __pycache__/
 # Model files
 # -----------------------
 codet5-small/
-pytorch_model.bin
 *.json       
 
 # -----------------------
 # Temporary or generated files
 # -----------------------
-*.txt       
-
-# Ignore any temporary or generated files
 *.txt
 *.log
