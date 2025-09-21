@@ -1,0 +1,45 @@
+# -----------------------
+# Ignore default files/folders
+# -----------------------
+/shelf/
+.workspace.xml
+
+# -----------------------
+# Editor/IDE files
+# -----------------------
+/.idea/
+*.iml
+/httpRequests/
+
+# -----------------------
+# Datasource/local storage
+# -----------------------
+/dataSources/
+dataSources.local.xml
+
+# -----------------------
+# Environment files
+# -----------------------
+.env
+
+# -----------------------
+# Python compiled files
+# -----------------------
+*.pyc
+__pycache__/
+
+# -----------------------
+# Model files
+# -----------------------
+codet5-small/
+pytorch_model.bin
+*.json       
+
+# -----------------------
+# Temporary or generated files
+# -----------------------
+*.txt       
+
+# Ignore any temporary or generated files
+*.txt
+*.log
