@@ -21,3 +21,9 @@
 - Provides actionable insights to improve code quality efficiently.  
 
 ---
+
+## Sources
+- [Code Readability](https://huggingface.co/datasets/se2p/code-readability-krod)
+- [QuixBugs (Correctness)](https://github.com/jkoppel/QuixBugs.git)
+- [CWE Bench (Security)](https://github.com/iris-sast/cwe-bench-java.git)
+- [Defects4J (Correctness)](https://github.com/rjust/defects4j.git)

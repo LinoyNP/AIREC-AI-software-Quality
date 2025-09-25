@@ -29,10 +29,10 @@ dataSources.local.xml
 __pycache__/
 
 # -----------------------
-# Model files
+# Ignore all dataset files
 # -----------------------
-codet5-small/
-*.json       
+qwen2/myDatasets/
+qwen2/datasets
 
 # -----------------------
 # Temporary or generated files

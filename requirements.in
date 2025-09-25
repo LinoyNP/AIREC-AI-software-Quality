@@ -11,3 +11,5 @@ torch
 fastapi
 uvicorn
 sentencepiece
+datasets
+jsonlines
