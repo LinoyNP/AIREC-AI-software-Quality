@@ -8,7 +8,6 @@ from openai import OpenAI  # OpenAI client library to interact with OpenAI / Hug
 #Noa
 import google.generativeai as genai  # Google Generative AI client library for using Gemini and other Google models
 import requests  # Standard library for sending HTTP requests, useful for APIs without a dedicated client
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM #for model code5T
 
 #-----------------------------------------MAIN
 app = Flask( __name__,)

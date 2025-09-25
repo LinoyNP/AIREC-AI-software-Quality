@@ -29,12 +29,6 @@ dataSources.local.xml
 __pycache__/
 
 # -----------------------
-# Ignore all dataset files
-# -----------------------
-qwen2/myDatasets/
-qwen2/datasets
-
-# -----------------------
 # Temporary or generated files
 # -----------------------
 *.txt

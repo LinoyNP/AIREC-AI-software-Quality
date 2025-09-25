@@ -5,11 +5,6 @@ openai
 google-generativeai
 google-genai
 requests
-transformers
-kernels
-torch
-fastapi
 uvicorn
-sentencepiece
-datasets
-jsonlines
+fastapi
+evals
