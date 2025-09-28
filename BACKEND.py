@@ -5,6 +5,7 @@ eventlet.monkey_patch()  # Modifies standard Python libraries to work asynchrono
 from flask import Flask, render_template, request, jsonify,send_from_directory   # Flask framework and utilities for web server, templates, handling requests, and returning JSON. Send_from_directory: serves static files (e.g., JavaScript, images, manifest) from a specified directory.
 from flask_socketio import SocketIO, emit  # SocketIO enables real-time communication between server and client; emit sends messages to clients
 from openai import OpenAI  # OpenAI client library to interact with OpenAI / HuggingFace models
+#from judge.langfuse_client import send_to_judge, get_judge_result
 #Noa
 import google.generativeai as genai  # Google Generative AI client library for using Gemini and other Google models
 import requests  # Standard library for sending HTTP requests, useful for APIs without a dedicated client
@@ -96,6 +97,19 @@ def handle_code(data):
 
     mistral_result = MistralAPI(prompt)
     emit('code_result', {'result': f"MISTRAL:\n{mistral_result}"})
+
+    evaluations = {
+    "GPT": hf_result,
+    "Gemini": gemini_result,
+    "Mistral": mistral_result
+    }
+    
+    #sending to judge
+    # final_score, full_assessment_json = send_to_judge(
+    # code=code, 
+    # evaluations=evaluations, 
+    # evaluator_name="CodeReview_JSON_Judge" 
+    # )
 
 @app.route('/')
 def index():

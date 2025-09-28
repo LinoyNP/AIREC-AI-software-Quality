@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Alan+Sans:wght@300..900&display=swap');
+
+/* Root variables for theme colors  */
+:root{
+    --accent-color: #343541;
+    --base-color: #10a37ed3;
+    --text-color: #10a37ed4;
+    --input-color:#c0dcda;     ;
+    --try: #dddddd;
+}
+
+/* Reset default margin & padding */
+*{
+    margin: 0;
+    padding: 0;
+}
+
+/* Global HTML styles */
+html{
+    font-family: 'Alan Sans','Segoe UI', sans-serif;
+    font-size: large;
+    color: var(--text-color);
+    text-align: center;
+}
+
+/* Body background styling */
+body{
+    background-color: var(--accent-color);
+}
+/* Signup page container */
+/* Fullscreen overlay with blur */
+.singup-page {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;                  
+  justify-content: center;
+  align-items: center;            
+  backdrop-filter: blur(6px);     
+}
+
+/*  Signup box (the card)  */
+.singup-box {
+    padding: 2rem;
+    border-radius: 12px;
+    border: 4px solid #104b35; /* מסגרת כחולה בעובי 2px */
+    border-radius: 12px;       /* פינות מעוגלות */
+    box-shadow: 0 8px 20px rgba(232, 232, 232, 0.3); /* צל לציפה */
+    max-width: 400px;
+    text-align: center;
+    
+}
+
+/* Form container */
+form{
+    width: min(400px, 100%);
+    margin-top:20px;
+    margin-bottom: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Each form row (icon + input) */
+form > div{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    /* gap: 3px;            */
+    margin-bottom:1rem;
+
+}
+
+/* Label styling (icon container) */
+form label {
+    flex-shrink: 0;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center; 
+    background-color: var(--base-color);
+    fill: white;
+    color: white;
+    border-radius: 10px 0 0 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Input fields styling */
+form input{
+    box-sizing: border-box;
+    flex-grow: 1;
+    border-radius: 0 10px 10px 0px;
+    min-width: 0;
+    height: 40px;
+    font-family: 'Alan Sans','Segoe UI';
+    padding: 1em;
+    background-color: var(--input-color);
+    border: 2px solid var(--base-color);
+    border-left: none;
+    transition: 150ms ease;
+    
+}
+
+/* Input hover effect */
+form input:hover{
+    border-color: #104b35;
+    border: 2px solid black;
+}
+
+/* Input focus effect */
+form input:focus{
+    outline: none;
+    border-color: antiquewhite;
+}
+
+/* Change label background when input is focused */
+div:has(input:focus)> label{
+    background-color: var(--input-color);
+
+}
+
+/* Placeholder text color */
+form input::placeholder{
+    color: var(--accent-color);
+}
+
+/* Submit button styling */
+form button{
+    margin-top: 10px;
+    border: none;
+    border-radius: 1000px;
+    padding: .85em 4em;
+    background-color: var(--base-color);
+    color: var(--input-color);
+    font-family: 'Alan Sans','Segoe UI';
+    cursor: pointer;
+    transition: 150ms ease;
+
+}
+
+/* Button hover effect */
+form button:hover{
+    background-color: black;
+}
+
+/* Links styling */
+a{
+    text-decoration: none;
+    color: var(--input-color);
+}
+a:hover{
+    text-decoration: underline;
+}
+
+/* Error state for incorrect inputs */
+form div.incorrect label {
+    background-color: #f06272;
+}
+form div.incorrect input{
+    background-color: #f06272;
+}
+
+
