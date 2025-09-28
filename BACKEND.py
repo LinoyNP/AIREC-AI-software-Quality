@@ -2,13 +2,15 @@ import os  # Allows the code to interact with the operating system, e.g., readin
 os.environ["EVENTLET_NO_GREENDNS"] = "yes"
 import eventlet  # A library for asynchronous networking, allows handling multiple connections efficiently
 eventlet.monkey_patch()  # Modifies standard Python libraries to work asynchronously with Eventlet
-from flask import Flask, render_template, request, jsonify,send_from_directory   # Flask framework and utilities for web server, templates, handling requests, and returning JSON. Send_from_directory: serves static files (e.g., JavaScript, images, manifest) from a specified directory.
+from flask import Flask, render_template, request,send_from_directory   # Flask framework and utilities for web server, templates, handling requests, and returning JSON. Send_from_directory: serves static files (e.g., JavaScript, images, manifest) from a specified directory.
 from flask_socketio import SocketIO, emit  # SocketIO enables real-time communication between server and client; emit sends messages to clients
 from openai import OpenAI  # OpenAI client library to interact with OpenAI / HuggingFace models
-#from judge.langfuse_client import send_to_judge, get_judge_result
-#Noa
 import google.generativeai as genai  # Google Generative AI client library for using Gemini and other Google models
 import requests  # Standard library for sending HTTP requests, useful for APIs without a dedicated client
+import threading
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #-----------------------------------------MAIN
 app = Flask( __name__,)
@@ -31,34 +33,25 @@ def check_hf_connection():
 #--------------------------------END CHECK FOR HF
 
 def build_analysis_prompt(code: str) -> str:
-    """
-       Defining engineering programming principles:
-       #readability- measure of how easily a person can understand a given code segment, easily one can understand
-           how the code actually functions and understanding the intent and purpose of the code.
-            •Consistent use of meaningful names to communicate intent rather than just content.
-            • Proper software structure, including modular code separated into clear logical blocks.
-            • Use comments sparingly- excessive commenting can be a sign of unclear code.
-            • Proper formatting, such as indentation, line length, and spacing, which contribute to visual comprehension
-            • without code smells- suggest design issues even if the code functions correctly like include unnecessary repetitions, unclear
-               variable names, or excessively long functions.
-       #Correctness - It refers to the accuracy with which code performs its intended tasks and requires thorough
-           verification and testing to guarantee that the code behaves as expected in all scenarios.
-           Understanding the task - If the task can be interpreted in multiple ways, ask the user what they mean.
-       #Security - ensure that systems can operate normally even under external threats and attacks.
-           check that there is no vulnerabilities in code such as bugs, defects, weaknesses,improper data validation or
-            incorrect memory allocation which can lead to violations of system security policies and negatively impact the confiden tiality, integrity, and availability of information
-           Safe memory management
-       """
     return f"""
-    Please analyze the following code in detail. The analysis should be written in Hebrew, clearly structured and visually organized.
+    Please analyze the following code in detail.clearly structured and visually organized.
     Code:
     {code}
-    For this code, please provide:
-    1. Readability: Give a percentage score (0-100%) and a detailed explanation in Hebrew about how easy it is to read and understand the code. Mention naming conventions, comments, formatting, and clarity.
-    2. Correctness: Give a percentage score (0-100%) and explain in Hebrew whether the code works as intended, whether there are potential bugs, logical errors, or edge cases that might fail.
-    3. Security: Give a percentage score (0-100%) and explain in Hebrew any security risks, vulnerabilities, or unsafe practices in the code.
-    4. Additional Notes: Any suggestions for improvement, refactoring, or best practices, in Hebrew. Be as detailed and precise as possible.
-    Format the output neatly with clear headings for each section, percentages, and explanations. Use line breaks and bullet points if needed to make it easy to read.
+    Defining engineering programming principles:
+    #readability- measure of how easily a person can understand a given code segment, easily one can understand
+        how the code actually functions and understanding the intent and purpose of the code.
+        •Consistent use of meaningful names to communicate intent rather than just content.
+        • Proper software structure, including modular code separated into clear logical blocks.
+        • Use comments sparingly- excessive commenting can be a sign of unclear code.
+        • Proper formatting, such as indentation, line length, and spacing, which contribute to visual comprehension
+        • without code smells- suggest design issues even if the code functions correctly like include unnecessary repetitions, unclear variable names, or excessively long functions.
+    #Correctness - It refers to the accuracy with which code performs its intended tasks and requires thorough
+        verification and testing to guarantee that the code behaves as expected in all scenarios.
+        Understanding the task - If the task can be interpreted in multiple ways, ask the user what they mean.
+    #Security - ensure that systems can operate normally even under external threats and attacks.
+        check that there is no vulnerabilities in code such as bugs, defects, weaknesses,improper data validation or
+        incorrect memory allocation which can lead to violations of system security policies and negatively impact the confidentiality, integrity, and availability of information
+        Safe memory management
     """
 
 def HuggingFaceAPI_GPT(prompt: str) -> str:
@@ -81,6 +74,49 @@ def MistralAPI(prompt: str) -> str:
     mistral_response = requests.post(MISTRAL_API_URL, headers=headers, json=data)
     return mistral_response.json()['choices'][0]['message']['content']
 
+def GPTJudgeAPI(responses: list, question: str) -> str:
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    
+    prompt = f"""
+    You are an expert code review judge.
+    Use the engineering programming principles defined below for your assessment.
+    remember! You are an expert professor tasked with merging multiple AI responses into one unified, high-quality answer.
+
+    Principles:
+    # Readability:
+    - Measure how easily a person can understand the code segment, its functionality, and intent.
+    - Look for consistent meaningful names, proper structure, modular blocks, sparing comments, good formatting, and absence of code smells.
+
+    # Correctness:
+    - Accuracy of code in performing intended tasks.
+    - Verification and testing to ensure the code behaves as expected.
+    - Clarify ambiguous tasks by asking what the user means if needed.
+
+    # Security:
+    - Ensure the code is safe under external threats.
+    - Check for vulnerabilities: bugs, defects, weaknesses, improper validation, unsafe memory usage.
+    - Safe memory management.
+
+    Instructions:
+    1. Read all the responses carefully and extract the most accurate and valuable insights from each one.
+    2. Combine these insights into a single, coherent explanation that flows naturally, without repeating contradictions or irrelevant details.
+    3. Structure the explanation according to the principles of Readability, Correctness, and Security, but present it as one unified answer — not as separate reviews of each response.
+    4. The final result should read like a polished academic explanation, as if written by a knowledgeable professor, integrating the best contributions from all responses.
+
+    Question / Code:
+    {question}
+
+    Responses:
+    {chr(10).join(responses)}
+    """
+    
+    completion = client.chat.completions.create(
+        model="gpt-4.1",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0
+    )
+    return completion.choices[0].message.content
+
 
 # Receiving code as text(string) from the user
 @socketio.on('send_code')
@@ -91,13 +127,17 @@ def handle_code(data):
     prompt = build_analysis_prompt(code)
 
     hf_result = HuggingFaceAPI_GPT(prompt)
-    emit('code_result', {'result': f"GPT:\n{hf_result}"})
+    # emit('code_result', {'result': f"GPT:\n{hf_result}"})
 
     gemini_result = GeminiAPI(prompt)
-    emit('code_result', {'result': f"GEMINI:\n{gemini_result}"})
+    # emit('code_result', {'result': f"GEMINI:\n{gemini_result}"})
 
     mistral_result = MistralAPI(prompt)
-    emit('code_result', {'result': f"MISTRAL:\n{mistral_result}"})
+    # emit('code_result', {'result': f"MISTRAL:\n{mistral_result}"})
+
+    all_responses = [hf_result, gemini_result, mistral_result]
+    judge_result = GPTJudgeAPI(all_responses, code)
+    emit('code_result', {'result': f"Judge:\n{judge_result}"})  
 
     evaluations = {
     "GPT": hf_result,
