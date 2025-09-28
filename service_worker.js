@@ -54,7 +54,7 @@ self.addEventListener('activate', event => {
             })
       )
     )
-  );
+  ));
   // immediately take control of all active clients (pages/tabs)
   self.clients.claim();
 });

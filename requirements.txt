@@ -4,58 +4,175 @@
 #
 #    pip-compile requirements.in
 #
+absl-py==2.3.1
+    # via
+    #   keras
+    #   tensorboard
+    #   tensorflow
+aiohappyeyeballs==2.6.1
+    # via aiohttp
+aiohttp==3.12.15
+    # via fsspec
+aiolimiter==1.2.1
+    # via evals
+aiosignal==1.4.0
+    # via aiohttp
 annotated-types==0.7.0
     # via pydantic
+anthropic==0.68.0
+    # via evals
 anyio==4.10.0
     # via
+    #   anthropic
     #   google-genai
     #   httpx
     #   openai
     #   starlette
+asn1crypto==1.5.1
+    # via snowflake-connector-python
+astunparse==1.6.3
+    # via tensorflow
+attrs==25.3.0
+    # via aiohttp
+backoff==2.2.1
+    # via evals
+beartype==0.21.0
+    # via evals
 bidict==0.23.1
     # via python-socketio
 blinker==1.9.0
     # via flask
+blis==1.3.0
+    # via thinc
+blobfile==3.1.0
+    # via evals
+boto3==1.40.38
+    # via snowflake-connector-python
+botocore==1.40.38
+    # via
+    #   boto3
+    #   s3transfer
+    #   snowflake-connector-python
 cachetools==5.5.2
     # via google-auth
+catalogue==2.0.10
+    # via
+    #   spacy
+    #   srsly
+    #   thinc
 certifi==2025.8.3
     # via
     #   httpcore
     #   httpx
     #   requests
+    #   snowflake-connector-python
+cffi==1.17.1
+    # via
+    #   cryptography
+    #   snowflake-connector-python
 charset-normalizer==3.4.3
-    # via requests
+    # via
+    #   requests
+    #   snowflake-connector-python
+chess==1.11.2
+    # via evals
 click==8.2.1
     # via
     #   flask
+    #   jiwer
+    #   nltk
+    #   typer
     #   uvicorn
+cloudpathlib==0.22.0
+    # via weasel
+cloudpickle==3.1.1
+    # via gymnasium
 colorama==0.4.6
     # via
     #   click
+    #   pytest
+    #   sacrebleu
     #   tqdm
+    #   wasabi
+confection==0.1.5
+    # via
+    #   thinc
+    #   weasel
+contourpy==1.3.3
+    # via matplotlib
+cryptography==46.0.0
+    # via
+    #   pyopenssl
+    #   snowflake-connector-python
+cycler==0.12.1
+    # via matplotlib
+cymem==2.0.11
+    # via
+    #   preshed
+    #   spacy
+    #   thinc
+dacite==1.9.2
+    # via evals
+datasets==4.1.1
+    # via
+    #   evals
+    #   evaluate
+dill==0.4.0
+    # via
+    #   datasets
+    #   evaluate
+    #   multiprocess
 distro==1.9.0
-    # via openai
+    # via
+    #   anthropic
+    #   openai
 dnspython==2.8.0
     # via eventlet
+docker==7.1.0
+    # via evals
+docstring-parser==0.17.0
+    # via anthropic
+evals==3.0.1.post1
+    # via -r requirements.in
+evaluate==0.4.6
+    # via evals
 eventlet==0.40.3
     # via -r requirements.in
+farama-notifications==0.0.4
+    # via gymnasium
 fastapi==0.116.2
     # via -r requirements.in
 filelock==3.19.1
     # via
+    #   blobfile
+    #   datasets
+    #   evals
     #   huggingface-hub
-    #   torch
-    #   transformers
+    #   snowflake-connector-python
+fire==0.7.1
+    # via evals
 flask==3.1.2
     # via
     #   -r requirements.in
+    #   evals
     #   flask-socketio
 flask-socketio==5.5.1
     # via -r requirements.in
-fsspec==2025.9.0
+flatbuffers==25.9.23
+    # via tensorflow
+fonttools==4.60.0
+    # via matplotlib
+frozenlist==1.7.0
     # via
+    #   aiohttp
+    #   aiosignal
+fsspec[http]==2025.9.0
+    # via
+    #   datasets
+    #   evaluate
     #   huggingface-hub
-    #   torch
+gast==0.6.0
+    # via tensorflow
 google-ai-generativelanguage==0.6.15
     # via google-generativeai
 google-api-core[grpc]==2.25.1
@@ -78,24 +195,39 @@ google-auth-httplib2==0.2.0
 google-genai==1.37.0
     # via -r requirements.in
 google-generativeai==0.8.5
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   evals
+google-pasta==0.2.0
+    # via tensorflow
 googleapis-common-protos==1.70.0
     # via
     #   google-api-core
     #   grpcio-status
 greenlet==3.2.4
-    # via eventlet
+    # via
+    #   eventlet
+    #   playwright
+    #   sqlalchemy
 grpcio==1.75.0
     # via
     #   google-api-core
     #   grpcio-status
+    #   tensorboard
+    #   tensorflow
 grpcio-status==1.71.2
     # via google-api-core
+gymnasium==1.2.1
+    # via evals
 h11==0.16.0
     # via
     #   httpcore
     #   uvicorn
     #   wsproto
+h5py==3.14.0
+    # via
+    #   keras
+    #   tensorflow
 httpcore==1.0.9
     # via httpx
 httplib2==0.31.0
@@ -104,46 +236,206 @@ httplib2==0.31.0
     #   google-auth-httplib2
 httpx==0.28.1
     # via
+    #   anthropic
     #   google-genai
+    #   langsmith
     #   openai
 huggingface-hub==0.35.0
     # via
-    #   kernels
-    #   tokenizers
-    #   transformers
+    #   datasets
+    #   evaluate
 idna==3.10
     # via
     #   anyio
     #   httpx
     #   requests
+    #   snowflake-connector-python
+    #   yarl
+iniconfig==2.1.0
+    # via pytest
 itsdangerous==2.2.0
     # via flask
 jinja2==3.1.6
     # via
     #   flask
-    #   torch
+    #   spacy
 jiter==0.11.0
-    # via openai
-kernels==0.10.1
-    # via -r requirements.in
+    # via
+    #   anthropic
+    #   openai
+jiwer==4.0.0
+    # via evals
+jmespath==1.0.1
+    # via
+    #   boto3
+    #   botocore
+joblib==1.5.2
+    # via nltk
+jsonpatch==1.33
+    # via langchain-core
+jsonpointer==3.0.0
+    # via jsonpatch
+keras==3.11.3
+    # via tensorflow
+kiwisolver==1.4.9
+    # via matplotlib
+langchain==0.3.27
+    # via evals
+langchain-core==0.3.76
+    # via
+    #   langchain
+    #   langchain-text-splitters
+langchain-text-splitters==0.3.11
+    # via langchain
+langcodes==3.5.0
+    # via spacy
+langdetect==1.0.9
+    # via evals
+langsmith==0.4.31
+    # via
+    #   langchain
+    #   langchain-core
+language-data==1.3.0
+    # via langcodes
+libclang==18.1.1
+    # via tensorflow
+lxml==6.0.2
+    # via
+    #   blobfile
+    #   sacrebleu
+lz4==4.4.4
+    # via evals
+marisa-trie==1.3.1
+    # via language-data
+markdown==3.9
+    # via tensorboard
+markdown-it-py==4.0.0
+    # via rich
 markupsafe==3.0.2
     # via
     #   flask
     #   jinja2
     #   werkzeug
-mpmath==1.3.0
-    # via sympy
+matplotlib==3.10.6
+    # via
+    #   evals
+    #   seaborn
+mdurl==0.1.2
+    # via markdown-it-py
+ml-dtypes==0.5.3
+    # via
+    #   keras
+    #   tensorflow
+mock==5.2.0
+    # via evals
+multidict==6.6.4
+    # via
+    #   aiohttp
+    #   yarl
+multiprocess==0.70.16
+    # via
+    #   datasets
+    #   evaluate
+murmurhash==1.0.13
+    # via
+    #   preshed
+    #   spacy
+    #   thinc
+mypy==1.18.2
+    # via evals
+mypy-extensions==1.1.0
+    # via mypy
+namex==0.1.0
+    # via keras
 networkx==3.5
-    # via torch
+    # via evals
+nltk==3.9.1
+    # via evals
+numexpr==2.13.0
+    # via evals
 numpy==2.3.3
-    # via transformers
+    # via
+    #   blis
+    #   contourpy
+    #   datasets
+    #   evals
+    #   evaluate
+    #   gymnasium
+    #   h5py
+    #   keras
+    #   matplotlib
+    #   ml-dtypes
+    #   numexpr
+    #   pandas
+    #   patsy
+    #   sacrebleu
+    #   scipy
+    #   seaborn
+    #   spacy
+    #   statsmodels
+    #   tensorboard
+    #   tensorflow
+    #   tensorflow-hub
+    #   thinc
 openai==1.107.3
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   evals
+opt-einsum==3.4.0
+    # via tensorflow
+optree==0.17.0
+    # via keras
+orjson==3.11.3
+    # via langsmith
 packaging==25.0
     # via
+    #   datasets
+    #   evaluate
     #   huggingface-hub
-    #   kernels
-    #   transformers
+    #   keras
+    #   langchain-core
+    #   langsmith
+    #   matplotlib
+    #   pytest
+    #   snowflake-connector-python
+    #   spacy
+    #   statsmodels
+    #   tensorboard
+    #   tensorflow
+    #   thinc
+    #   weasel
+pandas==2.3.2
+    # via
+    #   datasets
+    #   evals
+    #   evaluate
+    #   seaborn
+    #   snowflake-connector-python
+    #   statsmodels
+pathspec==0.12.1
+    # via mypy
+patsy==1.0.1
+    # via statsmodels
+pillow==11.3.0
+    # via
+    #   matplotlib
+    #   tensorboard
+platformdirs==4.4.0
+    # via snowflake-connector-python
+playwright==1.55.0
+    # via evals
+pluggy==1.6.0
+    # via pytest
+portalocker==3.2.0
+    # via sacrebleu
+preshed==3.0.10
+    # via
+    #   spacy
+    #   thinc
+propcache==0.3.2
+    # via
+    #   aiohttp
+    #   yarl
 proto-plus==1.26.1
     # via
     #   google-ai-generativelanguage
@@ -156,94 +448,278 @@ protobuf==5.29.5
     #   googleapis-common-protos
     #   grpcio-status
     #   proto-plus
+    #   tensorboard
+    #   tensorflow
+    #   tensorflow-hub
+pyarrow==21.0.0
+    # via
+    #   datasets
+    #   snowflake-connector-python
 pyasn1==0.6.1
     # via
     #   pyasn1-modules
     #   rsa
 pyasn1-modules==0.4.2
     # via google-auth
+pycparser==2.23
+    # via cffi
+pycryptodomex==3.23.0
+    # via blobfile
 pydantic==2.11.9
     # via
+    #   anthropic
+    #   confection
+    #   evals
     #   fastapi
     #   google-genai
     #   google-generativeai
+    #   langchain
+    #   langchain-core
+    #   langsmith
     #   openai
+    #   spacy
+    #   thinc
+    #   weasel
 pydantic-core==2.33.2
     # via pydantic
+pyee==13.0.0
+    # via playwright
+pygments==2.19.2
+    # via
+    #   pytest
+    #   rich
+pyjwt==2.10.1
+    # via snowflake-connector-python
+pyopenssl==25.3.0
+    # via snowflake-connector-python
 pyparsing==3.2.4
-    # via httplib2
+    # via
+    #   httplib2
+    #   matplotlib
+pytest==8.4.2
+    # via evals
+python-dateutil==2.9.0.post0
+    # via
+    #   botocore
+    #   matplotlib
+    #   pandas
 python-engineio==4.12.2
     # via python-socketio
 python-socketio==5.13.0
     # via flask-socketio
+pytz==2025.2
+    # via
+    #   pandas
+    #   snowflake-connector-python
+pywin32==311
+    # via
+    #   docker
+    #   portalocker
 pyyaml==6.0.2
     # via
+    #   datasets
+    #   evals
     #   huggingface-hub
-    #   kernels
-    #   transformers
+    #   langchain
+    #   langchain-core
+rapidfuzz==3.14.1
+    # via jiwer
 regex==2025.9.1
-    # via transformers
+    # via
+    #   nltk
+    #   sacrebleu
+    #   tiktoken
 requests==2.32.5
     # via
     #   -r requirements.in
+    #   datasets
+    #   docker
+    #   evaluate
     #   google-api-core
     #   google-genai
     #   huggingface-hub
-    #   transformers
+    #   langchain
+    #   langsmith
+    #   requests-toolbelt
+    #   snowflake-connector-python
+    #   spacy
+    #   tensorflow
+    #   tiktoken
+    #   weasel
+requests-toolbelt==1.0.0
+    # via langsmith
+rich==14.1.0
+    # via
+    #   keras
+    #   typer
 rsa==4.9.1
     # via google-auth
-safetensors==0.6.2
-    # via transformers
+s3transfer==0.14.0
+    # via boto3
+sacrebleu==2.5.1
+    # via evals
+scipy==1.16.2
+    # via statsmodels
+seaborn==0.13.2
+    # via evals
+shellingham==1.5.4
+    # via typer
 simple-websocket==1.1.0
     # via python-engineio
+six==1.17.0
+    # via
+    #   astunparse
+    #   google-pasta
+    #   langdetect
+    #   python-dateutil
+    #   tensorflow
+smart-open==7.3.1
+    # via weasel
 sniffio==1.3.1
     # via
+    #   anthropic
     #   anyio
     #   openai
+snowflake-connector-python[pandas]==3.17.4
+    # via evals
+sortedcontainers==2.4.0
+    # via snowflake-connector-python
+spacy==3.8.7
+    # via spacy-universal-sentence-encoder
+spacy-legacy==3.0.12
+    # via spacy
+spacy-loggers==1.0.5
+    # via spacy
+spacy-universal-sentence-encoder==0.4.6
+    # via evals
+sqlalchemy==2.0.43
+    # via langchain
+srsly==2.5.1
+    # via
+    #   confection
+    #   spacy
+    #   thinc
+    #   weasel
 starlette==0.48.0
     # via fastapi
-sympy==1.14.0
-    # via torch
+statsmodels==0.14.5
+    # via evals
+tabulate==0.9.0
+    # via sacrebleu
 tenacity==9.1.2
-    # via google-genai
-tokenizers==0.22.0
-    # via transformers
-torch==2.8.0
-    # via -r requirements.in
+    # via
+    #   google-genai
+    #   langchain-core
+tensorboard==2.20.0
+    # via tensorflow
+tensorboard-data-server==0.7.2
+    # via tensorboard
+tensorflow==2.20.0
+    # via
+    #   spacy-universal-sentence-encoder
+    #   tf-keras
+tensorflow-hub==0.16.1
+    # via spacy-universal-sentence-encoder
+termcolor==3.1.0
+    # via
+    #   evals
+    #   fire
+    #   tensorflow
+tf-keras==2.20.1
+    # via tensorflow-hub
+thinc==8.3.6
+    # via spacy
+tiktoken==0.11.0
+    # via evals
+tomlkit==0.13.3
+    # via snowflake-connector-python
 tqdm==4.67.1
     # via
+    #   datasets
+    #   evals
+    #   evaluate
     #   google-generativeai
     #   huggingface-hub
+    #   nltk
     #   openai
-    #   transformers
-transformers==4.56.1
-    # via -r requirements.in
+    #   spacy
+typer==0.19.2
+    # via
+    #   spacy
+    #   weasel
+types-pyyaml==6.0.12.20250915
+    # via evals
+types-requests==2.32.4.20250913
+    # via types-tqdm
+types-tqdm==4.67.0.20250809
+    # via evals
 typing-extensions==4.15.0
     # via
+    #   anthropic
     #   fastapi
     #   google-genai
     #   google-generativeai
     #   grpcio
+    #   gymnasium
     #   huggingface-hub
+    #   langchain-core
+    #   mypy
     #   openai
+    #   optree
     #   pydantic
     #   pydantic-core
-    #   torch
+    #   pyee
+    #   snowflake-connector-python
+    #   sqlalchemy
+    #   tensorflow
+    #   typer
     #   typing-inspection
 typing-inspection==0.4.1
     # via pydantic
+tzdata==2025.2
+    # via pandas
 uritemplate==4.2.0
     # via google-api-python-client
 urllib3==2.5.0
-    # via requests
+    # via
+    #   blobfile
+    #   botocore
+    #   docker
+    #   requests
+    #   types-requests
 uvicorn==0.35.0
     # via -r requirements.in
+wasabi==1.1.3
+    # via
+    #   spacy
+    #   thinc
+    #   weasel
+weasel==0.4.1
+    # via spacy
 websockets==15.0.1
     # via google-genai
 werkzeug==3.1.3
-    # via flask
+    # via
+    #   flask
+    #   tensorboard
+wheel==0.45.1
+    # via astunparse
+wrapt==1.17.3
+    # via
+    #   smart-open
+    #   tensorflow
 wsproto==1.2.0
     # via simple-websocket
+xxhash==3.5.0
+    # via
+    #   datasets
+    #   evaluate
+yarl==1.20.1
+    # via aiohttp
+zstandard==0.25.0
+    # via
+    #   evals
+    #   langsmith
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
