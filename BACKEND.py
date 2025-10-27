@@ -8,6 +8,7 @@ from openai import OpenAI  # OpenAI client library to interact with OpenAI / Hug
 import google.generativeai as genai  # Google Generative AI client library for using Gemini and other Google models
 import requests  # Standard library for sending HTTP requests, useful for APIs without a dedicated client
 import threading
+# cspell:ignore dotenv
 from dotenv import load_dotenv
 
 load_dotenv()
