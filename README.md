@@ -1,6 +1,9 @@
-# AIREC 
+# <img src="static/icons/Airec-96x96.png" alt="AIREC Logo" width="40" style="vertical-align: middle;"> AIREC  
 
-**AIREC** is an advanced **code analysis tool** designed to evaluate submitted code based on three core principles:
+**AIREC** is an AI-powered **code analysis tool** designed to evaluate source code based on three core principles: **Readability**, **Correctness**, and **Security**.  
+
+--- 
+
 ![AIREC Logo](static/icons/p.png)
 ---
 
@@ -20,17 +23,60 @@
 - Supports multiple programming languages and paradigms.  
 - Provides actionable insights to improve code quality efficiently.  
 
-## 📚 How to Use
-🔧 **JavaScript Setup (Frontend)**
-To run this project locally, first clone the repository using git clone https://github.com/LinoyNP/AIREC-AI-software-Quality.git and navigate into the project folder. 
-Make sure Node.js is installed, then run npm install to install all dependencies. 
-Create a .env file in the root directory and add your Firebase credentials using the following format: VITE_FIREBASE_API_KEY=your_api_key, VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com, VITE_FIREBASE_PROJECT_ID=your_project_id, VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com, VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id, and VITE_FIREBASE_APP_ID=your_app_id. Once the environment variables are set, start the development server with npm run dev, and the app will be available at http://localhost:5000
-
-🐍 **Python Setup (Backend)**
-To install the required Python packages, this project uses a two-step dependency management system with requirements.in and requirements.txt. The requirements.in file contains the high-level dependencies you define manually. To generate a pinned requirements.txt file with exact versions, run:
-pip install pip-tools
-pip-compile requirements.in
-Then, install all dependencies with:
- pip install -r requirements.txt. 
- This ensures consistent environments across machines and makes it easier to manage updates.
 ---
+
+## 🧩 Tech Stack  
+
+- **Backend:** Python, Flask  
+- **Frontend:** HTML, CSS, JavaScript  
+- **AI Models:** Mistral, Gemini, GPT
+- **Environment Management:** pip-tools, `.env`  
+
+---
+
+## 📚 How to Run the Project  
+### 🐍 Python Setup (Backend)  
+
+1. Make sure **Python 3.10+** is installed.  
+
+2. Clone the repository:  
+   ```bash
+   git clone https://github.com/LinoyNP/AIREC-AI-software-Quality.git
+3. Navigate into the project directory:
+   ```bash
+   cd AIREC-AI-software-Quality
+4. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   ```
+   **On Windows:**
+   ```bash
+   venv\Scripts\activate
+   ```
+   **On macOS/Linux:**
+   ```bash
+   source venv/bin/activate
+   ```
+5. Install all dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+6. Create a file named .env in the project root and add your API keys:
+   ```bash
+   MISTRAL_API_KEY=your_mistral_key
+   HUGGINGFACE_API_KEY=your_huggingface_key
+   GEMINI_API_KEY=your_gemini_key
+   ```
+7. Run the Flask development server:
+   ```bash
+   python app.py
+   ```
+8. Open your browser and go to:
+   ```bash
+   http://localhost:5000
+    ```
+---
+
+## 👩‍💻 Contributors
+Linoy Nisim Pur  
+Noa Shem Tov
