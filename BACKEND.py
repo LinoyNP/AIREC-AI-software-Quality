@@ -3,14 +3,17 @@ from threading import Lock
 os.environ["EVENTLET_NO_GREENDNS"] = "yes"
 import eventlet  # A library for asynchronous networking, allows handling multiple connections efficiently
 eventlet.monkey_patch()  # Modifies standard Python libraries to work asynchronously with Eventlet
-from flask import Flask, render_template, request, jsonify,send_from_directory   # Flask framework and utilities for web server, templates, handling requests, and returning JSON. Send_from_directory: serves static files (e.g., JavaScript, images, manifest) from a specified directory.
+from flask import Flask, render_template, request,send_from_directory   # Flask framework and utilities for web server, templates, handling requests, and returning JSON. Send_from_directory: serves static files (e.g., JavaScript, images, manifest) from a specified directory.
 from flask_socketio import SocketIO, emit  # SocketIO enables real-time communication between server and client; emit sends messages to clients
 from openai import OpenAI  # OpenAI client library to interact with OpenAI / HuggingFace models
-#from judge.langfuse_client import send_to_judge, get_judge_result
-#Noa
 import google.generativeai as genai  # Google Generative AI client library for using Gemini and other Google models
 import requests  # Standard library for sending HTTP requests, useful for APIs without a dedicated client
 EXPECTED_MODELS = 2 #Number of models that will take part in code quality assessment
+import threading
+# cspell:ignore dotenv
+from dotenv import load_dotenv
+
+load_dotenv()
 
 #-----------------------------------------MAIN
 app = Flask( __name__,)
@@ -34,23 +37,9 @@ def check_hf_connection():
 
 # def build_analysis_prompt(code: str) -> str:
 #     """
-#        Defining engineering programming principles:
-#        #readability- measure of how easily a person can understand a given code segment, easily one can understand
-#            how the code actually functions and understanding the intent and purpose of the code.
-#             •Consistent use of meaningful names to communicate intent rather than just content.
-#             • Proper software structure, including modular code separated into clear logical blocks.
-#             • Use comments sparingly- excessive commenting can be a sign of unclear code.
-#             • Proper formatting, such as indentation, line length, and spacing, which contribute to visual comprehension
-#             • without code smells- suggest design issues even if the code functions correctly like include unnecessary repetitions, unclear
-#                variable names, or excessively long functions.
-#        #Correctness - It refers to the accuracy with which code performs its intended tasks and requires thorough
-#            verification and testing to guarantee that the code behaves as expected in all scenarios.
-#            Understanding the task - If the task can be interpreted in multiple ways, ask the user what they mean.
-#        #Security - ensure that systems can operate normally even under external threats and attacks.
-#            check that there is no vulnerabilities in code such as bugs, defects, weaknesses,improper data validation or
-#             incorrect memory allocation which can lead to violations of system security policies and negatively impact the confiden tiality, integrity, and availability of information
-#            Safe memory management
-#        """
+#     Prompt for evaluating code quality based on academic principles of readability, correctness, and security.
+#     """
+# ------option 1--------
 #     return f"""
 #     Please analyze the following code in detail. The analysis should be written in Hebrew, clearly structured and visually organized.
 #     Code:
@@ -62,6 +51,27 @@ def check_hf_connection():
 #     4. Additional Notes: Any suggestions for improvement, refactoring, or best practices, in Hebrew. Be as detailed and precise as possible.
 #     Format the output neatly with clear headings for each section, percentages, and explanations. Use line breaks and bullet points if needed to make it easy to read.
 #     """
+# ------option 2------
+#     return f"""
+#     Please analyze the following code in detail.clearly structured and visually organized.
+#     Code:
+#     {code}
+#     Defining engineering programming principles:
+#     #readability- measure of how easily a person can understand a given code segment, easily one can understand
+#         how the code actually functions and understanding the intent and purpose of the code.
+#         •Consistent use of meaningful names to communicate intent rather than just content.
+#         • Proper software structure, including modular code separated into clear logical blocks.
+#         • Use comments sparingly- excessive commenting can be a sign of unclear code.
+#         • Proper formatting, such as indentation, line length, and spacing, which contribute to visual comprehension
+#         • without code smells- suggest design issues even if the code functions correctly like include unnecessary repetitions, unclear variable names, or excessively long functions.
+#     #Correctness - It refers to the accuracy with which code performs its intended tasks and requires thorough
+#         verification and testing to guarantee that the code behaves as expected in all scenarios.
+#         Understanding the task - If the task can be interpreted in multiple ways, ask the user what they mean.
+#     #Security - ensure that systems can operate normally even under external threats and attacks.
+#         check that there is no vulnerabilities in code such as bugs, defects, weaknesses,improper data validation or
+#         incorrect memory allocation which can lead to violations of system security policies and negatively impact the confidentiality, integrity, and availability of information
+#         Safe memory management
+#     """
 
 def build_analysis_prompt(code: str) -> str:
     """
@@ -69,22 +79,16 @@ def build_analysis_prompt(code: str) -> str:
     """
     return f"""
     Please analyze the following code in detail. The analysis should be written in Hebrew, clearly structured and visually organized.
-
     Code:
     {code}
-
     For this code, please evaluate the following criteria:
-
     1. **Readability** (0–100%): Assess how easy it is to read and understand the code. Consider the use of meaningful and consistent naming, modular structure, logical organization, appropriate use of comments (not excessive or redundant), clean formatting (indentation, spacing, line length), avoidance of "magic numbers", use of conventional idioms, and overall stylistic consistency. Readability reflects how clearly the code communicates its purpose and operation to a human reader.
-
     2. **Correctness** (0–100%): Evaluate whether the code performs its intended functionality accurately. Identify any logical errors, potential bugs, or unhandled edge cases. Consider whether the code aligns with its natural language description or requirements, and whether it could be reliably tested. Correctness involves both the internal logic and the external behavior of the code under various conditions.
-
     3. **Security** (0–100%): Analyze the code for potential security risks or unsafe practices. Look for improper input handling, unsafe memory usage, hardcoded values, or patterns that could lead to vulnerabilities. Assess whether the code maintains confidentiality, integrity, and availability, and whether it is resilient to unexpected or malicious inputs.
-
     4. **Additional Notes**: Provide any suggestions for improvement, refactoring, or adherence to best practices. Be as specific and actionable as possible.
-
     Format the output with clear section headings, percentage scores, and detailed explanations. Use line breaks and bullet points where appropriate to enhance readability.
     """
+
 
 
 def HuggingFaceAPI_GPT(prompt: str) -> str:
@@ -210,27 +214,32 @@ def handle_code(data):
     socketio.start_background_task(call_model, "GPT", HuggingFaceAPI_GPT)
     socketio.start_background_task(call_model, "GEMINI", GeminiAPI)
 
-
+    #------without multitasking--------
     # hf_result = HuggingFaceAPI_GPT(prompt)
-    # emit('code_result', {'result': f"GPT:\n{hf_result}"})
-    # print('code_result', {'result': f"GPT:\n{hf_result}"})
+    # # emit('code_result', {'result': f"GPT:\n{hf_result}"})
+    #
     # gemini_result = GeminiAPI(prompt)
-    # emit('code_result', {'result': f"GEMINI:\n{gemini_result}"})
-
+    # # emit('code_result', {'result': f"GEMINI:\n{gemini_result}"})
+    #
     # mistral_result = MistralAPI(prompt)
-    # emit('code_result', {'result': f"MISTRAL:\n{mistral_result}"})
+    # # emit('code_result', {'result': f"MISTRAL:\n{mistral_result}"})
+    #
+    # all_responses = [hf_result, gemini_result, mistral_result]
+    # judge_result = GPTJudgeAPI(all_responses, code)
+    # emit('code_result', {'result': f"Judge:\n{judge_result}"})
+
 
     # evaluations = {
     # "GPT": hf_result,
     # "Gemini": gemini_result,
     # "Mistral": mistral_result
     # }
-    
+
     #sending to judge
     # final_score, full_assessment_json = send_to_judge(
-    # code=code, 
-    # evaluations=evaluations, 
-    # evaluator_name="CodeReview_JSON_Judge" 
+    # code=code,
+    # evaluations=evaluations,
+    # evaluator_name="CodeReview_JSON_Judge"
     # )
 
 @app.route('/')
