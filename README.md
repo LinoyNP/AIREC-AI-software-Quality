@@ -69,7 +69,7 @@
    ```
 7. Run the Flask development server:
    ```bash
-   python app.py
+   python BACKEND.py
    ```
 8. Open your browser and go to:
    ```bash
