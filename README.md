@@ -73,7 +73,7 @@
    ```
 8. Open your browser and go to:
    ```bash
-   http://localhost:5000
+   http://localhost:5001
     ```
 ---
 
