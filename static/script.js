@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     cacheDomElements();
     setupFormListener();
     initializeSocket();
-    registerServiceWorker();
+   // registerServiceWorker();
 });
 
 function cacheDomElements() {
@@ -152,31 +152,31 @@ function autoGrow(element) {
 }
 
 // ----------OFFLINE MODE----------
-function runLocalModel(code) {
-    // The actions that will be performed offline
-    // =========================
-    // TODO:
-    // ----------------------------------------------MODEL AI
-    appendMessage("You are offline.\n Local result for: " + code, "bot");
-}
+// function runLocalModel(code) {
+//     // The actions that will be performed offline
+//     // =========================
+//     // TODO:
+//     // ----------------------------------------------MODEL AI
+//     appendMessage("You are offline.\n Local result for: " + code, "bot");
+// }
 
-// ----------SERVICE WORKER----------
-function registerServiceWorker() {
-    // Register the Service Worker
-    // This code ensures the Service Worker (managing the logic of requests) is registered only after the entire page has fully loaded,
-    // which is a best practice to avoid blocking the initial page load.
-    // It's recommended to place this in main application JavaScript file.
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service_worker.js')
-                .then(registration => {
-                    // Service Worker registration successful
-                    console.log('Service Worker registered with scope:', registration.scope);
-                })
-                .catch(error => {
-                    // Service Worker registration failed
-                    console.error('Service Worker registration failed:', error);
-                });
-        });
-    }
-}
+// // ----------SERVICE WORKER----------
+// function registerServiceWorker() {
+//     // Register the Service Worker
+//     // This code ensures the Service Worker (managing the logic of requests) is registered only after the entire page has fully loaded,
+//     // which is a best practice to avoid blocking the initial page load.
+//     // It's recommended to place this in main application JavaScript file.
+//     if ('serviceWorker' in navigator) {
+//         window.addEventListener('load', () => {
+//             navigator.serviceWorker.register('/service_worker.js')
+//                 .then(registration => {
+//                     // Service Worker registration successful
+//                     console.log('Service Worker registered with scope:', registration.scope);
+//                 })
+//                 .catch(error => {
+//                     // Service Worker registration failed
+//                     console.error('Service Worker registration failed:', error);
+//                 });
+//         });
+//     }
+// }

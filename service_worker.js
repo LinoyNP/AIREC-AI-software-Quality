@@ -60,13 +60,25 @@ self.addEventListener('activate', event => {
 });
 
 
-//Fetch events - any network request that comes from the page.
-//When receive the request (event.request), if the response exists in the cache it will be returned from there, otherwise a response from the fetch will be returned to the network.
+// //Fetch events - any network request that comes from the page.
+// //When receive the request (event.request), if the response exists in the cache it will be returned from there, otherwise a response from the fetch will be returned to the network.
+// self.addEventListener('fetch', event => {
+//     console.log(event);
+//     event.respondWith(
+//     caches.match(event.request).then((cached) => {
+//         return cached || fetch(event.request);
+//     })
+//   );
+// });
+
 self.addEventListener('fetch', event => {
-    console.log(event);
-    event.respondWith(
-    caches.match(event.request).then((cached) => {
-        return cached || fetch(event.request);
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      if (cached) return cached;
+      return fetch(event.request).catch(err => {
+        console.error('Fetch failed for:', event.request.url, err);
+        return new Response('Network request failed', { status: 408 });
+      });
     })
   );
 });
